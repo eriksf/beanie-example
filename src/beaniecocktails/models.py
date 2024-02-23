@@ -1,12 +1,11 @@
 from typing import Optional, List
-
 from beanie import Document
 from pydantic import BaseModel, Field
 
 
 class Cocktail(Document):
-    class DocumentMeta:
-        collection_name = "recipes"
+    class Settings:
+        name = "recipes"
 
     name: str
     ingredients: List["Ingredient"]
@@ -15,12 +14,12 @@ class Cocktail(Document):
 
 class Ingredient(BaseModel):
     name: str
-    quantity: Optional["IngredientQuantity"]
+    quantity: Optional["IngredientQuantity"] = None
 
 
 class IngredientQuantity(BaseModel):
-    quantity: Optional[str]
-    unit: Optional[str]
+    quantity: Optional[str] = None
+    unit: Optional[str] = None
 
 
 class IngredientAggregation(BaseModel):
@@ -30,5 +29,5 @@ class IngredientAggregation(BaseModel):
     total: int
 
 
-Cocktail.update_forward_refs()
-Ingredient.update_forward_refs()
+Cocktail.model_rebuild()
+Ingredient.model_rebuild()

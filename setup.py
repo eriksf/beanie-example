@@ -22,10 +22,11 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "fastapi==0.63.0",
-        "beanie==0.2.3",
-        "uvicorn[standard] == 0.12.2",
+        "fastapi==0.109.2",
+        "beanie==1.25.0",
+        "uvicorn[standard] == 0.27.1",
         "dnspython",
+        "pydantic-settings==2.2.1",
     ],
     extras_require=EXTRAS_REQUIRE,
 )

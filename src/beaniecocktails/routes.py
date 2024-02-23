@@ -1,9 +1,8 @@
 from typing import List
-
 from fastapi import APIRouter, HTTPException, Depends
-from beanie.fields import PydanticObjectId
-
+from beanie import PydanticObjectId
 from .models import Cocktail, IngredientAggregation
+
 
 cocktail_router = APIRouter()
 
@@ -24,6 +23,7 @@ async def get_cocktail_by_id(cocktail: Cocktail = Depends(get_cocktail)):
 
 @cocktail_router.get("/cocktails/", response_model=List[Cocktail])
 async def list_cocktails():
+    print("Running this query...")
     return await Cocktail.find_all().to_list()
 
 
@@ -37,31 +37,10 @@ async def list_ingredients():
     """ Group on each ingredient name and return a list of `IngredientAggregation`s. """
 
     return await Cocktail.aggregate(
-        aggregation_query=[
+        [
             {"$unwind": "$ingredients"},
             {"$group": {"_id": "$ingredients.name", "total": {"$sum": 1}}},
             {"$sort": {"_id": 1}},
         ],
-        item_model=IngredientAggregation,
+        projection_model=IngredientAggregation,
     ).to_list()
-
-
-@cocktail_router.get("/cocktail_autocomplete", response_model=List[str])
-async def cocktail_autocomplete(fragment: str):
-    """ Return an array of cocktail names matched from a string fragment. """
-
-    return [
-        c["name"]
-        for c in await Cocktail.aggregate(
-            aggregation_query=[
-                {
-                    "$search": {
-                        "autocomplete": {
-                            "query": fragment,
-                            "path": "name",
-                        }
-                    }
-                }
-            ]
-        ).to_list()
-    ]
